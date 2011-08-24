@@ -1,8 +1,35 @@
 Project to build Jackson (http://jackson.codehaus.org) module (jar) to support JSON serialization and deserialization of Hibernate (http://hibernate.org) specific datatypes and properties; especially lazy-loading aspects.
 
-== Usage ==
+## Status
 
-h2. Using with Spring MVC
+As of version 0.7.0, Hibernate module is usable, although rough edges still exist.
+
+Main focus is to add more complete unit testing (base test exist).
+
+## Usage
+
+### Maven dependency
+
+To use module on Maven-based projects, use following dependency:
+
+    <dependency>
+      <groupId>com.fasterxml</groupId>
+      <artifactId>jackson-module-hibernate</artifactId>
+      <version>0.7.0</version>
+    </dependency>    
+
+(or whatever version is most up-to-date at the moment)
+
+### Registering module
+
+Like all standard Jackson modules (libraries that implement Module interface), registration is done as follows:
+
+    ObjectMapper mapper = new ObjectMapper();
+    mapper.registerModule(new HibernateModule());
+
+after which functionality is available for all normal Jackson operations.
+
+### Using with Spring MVC
 
 (as contributed by Frank Hess)
 

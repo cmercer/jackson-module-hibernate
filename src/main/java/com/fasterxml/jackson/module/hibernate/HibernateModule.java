@@ -17,8 +17,21 @@ public class HibernateModule extends Module
         /**
          * Whether lazy-loaded object should be forced to be loaded and then serialized
          * (true); or serialized as nulls (false).
+         *<p>
+         * Default value is false.
          */
-        FORCE_LAZY_LOADING(false)
+        FORCE_LAZY_LOADING(false),
+
+        /**
+         * Whether @Transient annotation should be checked or not; if true, will consider
+         * @Transient to mean that property is to be ignored; if false annotation will
+         * have no effect.
+         *<p>
+         * Default value is true.
+         * 
+         * @since 0.7.0
+         */
+        USE_TRANSIENT_ANNOTATION(true)
         ;
 
         final boolean _defaultState;
@@ -58,9 +71,9 @@ public class HibernateModule extends Module
     protected int _moduleFeatures = DEFAULT_FEATURES;
     
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Life-cycle
-    /**********************************************************
+    /**********************************************************************
      */
     
     public HibernateModule() { }
@@ -74,15 +87,28 @@ public class HibernateModule extends Module
         /* First, append annotation introspector (no need to override, esp.
          * as we just implement couple of methods)
          */
-        context.appendAnnotationIntrospector(new HibernateAnnotationIntrospector());
         // Then add serializers we need
+        AnnotationIntrospector ai = annotationIntrospector();
+        if (ai != null) {
+            context.appendAnnotationIntrospector(ai);
+        }
         context.addSerializers(new HibernateSerializers(_moduleFeatures));
     }
 
+    /**
+     * Method called during {@link #setupModule}, to create {@link AnnotationIntrospector}
+     * to register along with module. If null is returned, no introspector is added.
+     */
+    protected AnnotationIntrospector annotationIntrospector() {
+        HibernateAnnotationIntrospector ai = new HibernateAnnotationIntrospector();
+        ai.setUseTransient(isEnabled(Feature.USE_TRANSIENT_ANNOTATION));
+        return ai;
+    }
+    
     /*
-    /**********************************************************
+    /**********************************************************************
     /* Extended API, configuration
-    /**********************************************************
+    /**********************************************************************
      */
 
     public HibernateModule enable(Feature f) {
